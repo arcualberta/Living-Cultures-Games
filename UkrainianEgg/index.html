@@ -1,0 +1,111 @@
+<html>
+    <head>
+        <title>Ukraine Alive - Easter Egg</title>
+
+        <script type="text/javascript" src="./js/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="./js/glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="./js/gl_soft.js"></script>
+        <script type="text/javascript" src="./js/easter_egg.js"></script>
+        <style>
+            .color {
+                width: 46px;
+                height: 46px;
+                cursor: pointer;
+            }
+
+            .selected {
+                border: aquamarine dashed 1px;
+            }
+            
+            .rotatable {
+                cursor: -webkit-grab;
+                cursor: -moz-grab;
+            }
+            
+            .rotatable:active {
+                cursor: -webkit-grabbing;
+                cursor: -moz-grabbing;
+            }
+        </style>
+    </head>
+    <body> 
+        <div id="selectPanel">
+
+        </div>
+        <div style="width: 80%; height: auto; float:left;">
+            <div id="colorPanel" style="float: left">
+                <div style="background-color: red;" class="color selected" data-color="[255, 0, 0]" draggable="true"></div>
+                <div style="background-color: orange;" class="color" data-color="[255, 165, 0]" draggable="true"></div>
+                <div style="background-color: yellow;" class="color" data-color="[255, 255, 0]" draggable="true"></div>
+                <div style="background-color: green;" class="color" data-color="[0, 128, 0]" draggable="true"></div>
+                <div style="background-color: blue;" class="color" data-color="[0, 0, 255]" draggable="true"></div>
+                <div style="background-color: indigo;" class="color" data-color="[75, 0, 130]" draggable="true"></div>
+                <div style="background-color: violet;" class="color" data-color="[238, 130, 238]" draggable="true"></div>
+                <div style="background-color: white;" class="color" data-color="[255, 255, 255]" draggable="true"></div>
+                <div style="background-color: black;" class="color" data-color="[0, 0, 0]" draggable="true"></div>
+            </div>
+            <canvas style="float: left;" id="imagePanel" width="512" height="662" ondragover="event.preventDefault();"></canvas>
+            <div style="float: left; width: 400; text-align: center;">
+                <a href="#" id="saveColor">Save Coloring</a>
+                <canvas id="eggPanel" width="400" height="400" class="rotatable"></canvas>
+            </div>
+        </div>
+
+
+
+
+
+
+        <script type="text/javascript">
+            var game;
+            var selectedImage = 0;
+            
+            function selectEgg(image, i){
+                image.click(function(){
+                    $("#selectPanel img").removeClass("selected");
+                    $(image).addClass("selected");
+                        
+                    if(selectedImage != i){
+                        selectedImage = i;
+                        game.selectEgg(i);
+                    }
+                });
+            }
+            
+            function saveCanvasImage(link, canvasId, name){
+                var canvas = $('#' + canvasId)[0];
+                var dataURL = canvas.toDataURL();
+                
+                link.href = dataURL;
+                link.download = name;
+            }
+            
+            $(document).ready(function(){
+                $('#saveColor').click(function() {
+                    saveCanvasImage(this, 'imagePanel', 'pysanky.png');
+                });
+                
+                game = new EasterEgg('imagePanel', 'eggPanel');
+                
+                var eggList = game.getEggList();
+                for(var i = 0; i < eggList.length; ++i){
+                    var image = $(eggList[i].image);
+                    image.css("height", 92);
+                    image.css("width", Math.round(92 * (image.width / image.height)));
+                    image.css("cursor", "pointer");
+                    
+                    if(i == 0){
+                        image.addClass("selected");
+                        selectedImage = image;
+                    }
+                    
+                    selectEgg(image, i);
+                    
+                    $("#selectPanel").append(image);
+                }
+                
+                game.start();
+            });
+        </script>
+    </body>
+</html>

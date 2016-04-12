@@ -1,0 +1,10 @@
+{
+    "name": "My Pysanky",
+    "description": "Paint the Ukrainian Easter egg.",
+    "version": "0.1",
+    "app": {
+        "background": {
+            "scripts": ["background.js"]
+        }
+    }
+}

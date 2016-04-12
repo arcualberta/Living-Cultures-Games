@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>China Alive Quiz</title>
+
+        <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="./quiz.css" rel="stylesheet">
+
+        <script type="text/javascript" src="./js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="./js/angular.min.js"></script>
+        <script type="text/javascript" src="./js/quiz-game.js"></script>
+    </head>
+    <body ng-app="quizApp" ng-controller="MainController" class="container-fluid">
+        <div id="titleBar" class="container-fluid" ng-include src="'header.html'">
+            
+        </div>
+        <div id="questionArea" class="container-fluid" ng-include src="getQuestionPage()">
+            
+        </div>
+        <div id="hintBook" ng-include="'hint.html'">
+            
+        </div>
+        
+        <script src="./bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var scope = angular.element(document.getElementsByTagName("body")).scope();
+                scope.getData("./quizzes/quiz1.json");
+            });
+        </script>
+    </body>
+</html>

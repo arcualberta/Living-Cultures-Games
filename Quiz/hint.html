@@ -1,0 +1,13 @@
+<div class="cover" ng-click="hideScroll()">
+    
+</div>
+<div class="scroll" ng-click="hideScroll()">
+    <img class="scroll-side" style="margin-right: -10px; margin-left: auto;" src="./img/scroll-left.png" alt="scroll left" ng-click="hideScroll()"/>
+    <div id="hintContent" >
+        <div>
+            <h1>{{currentQuestion.Hint}}</h1>
+            <h3><a href="{{currentQuestion['Hint Link']}}" target="_blank">Learn More</a></h3>
+        </div>
+    </div>
+    <img class="scroll-side" style="margin-left: -10px; margin-right: auto;" src="./img/scroll-right.png" alt="scroll right" ng-click="hideScroll()"/>
+</div>

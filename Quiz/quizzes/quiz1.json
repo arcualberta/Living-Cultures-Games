@@ -1,0 +1,27 @@
+{
+    "Title": "China Alive Quiz 1",
+    "Questions": [
+        {
+            "Question": "It is the first meal of the Spring Festival.",
+            "Answer": "Dumplings",
+            "Decoys": ["Noodle soup"],
+            "Images": {
+              "Noodle soup": "./img/noodle.png",
+              "Dumplings": "./img/dumpling.png"
+            },
+            "Hint": "Pst! Its not noodles!",
+            "Hint Link": "http://chinaalive.ualberta.ca/index.php/festivals/"
+        },
+        {
+            "Question": "What is the special food of Mid-Autumn Festival?",
+            "Answer": "Mooncake",
+            "Decoys": ["Sushi"],
+            "Images": {
+              "Sushi": "./img/sushi.png",
+              "Mooncake": "./img/mooncake.png"
+            },
+            "Hint": "Look up, way up!",
+            "Hint Link": "http://chinaalive.ualberta.ca/index.php/festivals/"
+        }
+    ]
+}

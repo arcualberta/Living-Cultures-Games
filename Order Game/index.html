@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Order Game</title>
+
+        <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+        <script type="text/javascript" src="./js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="./js/order-game.js"></script>
+
+        <style>
+            p {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -o-user-select: none;
+                user-select: none;
+            }
+
+            .card-text{
+                text-align: center;
+                vertical-align: bottom;
+                color: #FFFFDD;
+                font-weight: bold;
+                text-shadow: 0px 0px 5px #D61212;
+                
+                user-select: none;
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -o-user-select: none;
+                
+                pointer-events: none;
+                cursor: default;
+            }
+        </style>
+    </head>
+    <body class="container-fluid">
+        <h2 id="status"></h2>
+        <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background: url('./img/mmexport1458673168399.jpg'); background-size: cover; background-position: center">
+            <svg id="game_area" viewBox = "0 0 800 600" style="display: block; margin-left: auto; margin-right: auto; overflow: visible;" height="100%" preserveAspectRatio="xMaxYMax">
+
+            </svg>
+        </div>
+
+
+        <script src="./bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+            var game;
+
+            $(document).ready(function () {
+                game = new Game($('#game_area')[0],
+                        ['./img/bloom.jpg', './img/green_apple.jpg', './img/paper_bag.jpg', './img/milky_apple.jpg', './img/big_red.jpg'],
+                        ['Flower', 'Little Green Apple', 'Apple with Paper Bag', 'Big Milky Apple', 'Big Red Apple'],
+                        ['./img/apple1.png', './img/apple2.png'],
+                        "From left to right, what order should these apples be in?");
+
+                /*game.onWin = function () {
+                 $("#status").text("You Win!");
+                 };*/
+                /*game.onFail = function () {
+                 $("#status").text("Somethings not right...");
+                 };*/
+                /*game.onNormal = function () {
+                 $("#status").text("");
+                 };*/
+            });
+        </script>
+    </body>
+</html>
