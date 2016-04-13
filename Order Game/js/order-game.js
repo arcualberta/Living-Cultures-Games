@@ -336,10 +336,13 @@
     Game.prototype.dropCard = function () {
         if (Game.STATE_PLAYING === this.state) {
             var card = this.selectedCard;
-            this.selectedCard = null;
-            card.recalculate();
+            
+            if(card != null){
+                this.selectedCard = null;
+                card.recalculate();
 
-            this.playArea.dropCard(card);
+                this.playArea.dropCard(card);
+            }
 
             this.evaluate();
         }

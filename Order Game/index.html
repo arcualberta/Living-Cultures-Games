@@ -35,10 +35,37 @@
                 pointer-events: none;
                 cursor: default;
             }
+            
+            .back-button{
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+                background-color: #fff;
+                padding: 10px;
+                border-radius: 5px;
+                border: #CCC 1px solid;
+            }
+            
+            .back-button:hover {
+                background-color: #CCC;
+                border-color: #333;
+            }
+            
+            .back-button > a {
+                color: #000;
+            }
+            
+            .back-button > a:hover {
+                color: #000;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body class="container-fluid">
-        <h2 id="status"></h2>
+        <div class="back-button">
+            <a href="http://chinaalive.ualberta.ca/index.php/living-in-the-village/"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Back</a>
+        </div>
         <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background: url('./img/mmexport1458673168399.jpg'); background-size: cover; background-position: center">
             <svg id="game_area" viewBox = "0 0 800 600" style="display: block; margin-left: auto; margin-right: auto; overflow: visible;" height="100%" preserveAspectRatio="xMaxYMax">
 
@@ -56,16 +83,6 @@
                         ['Flower', 'Little Green Apple', 'Apple with Paper Bag', 'Big Milky Apple', 'Big Red Apple'],
                         ['./img/apple1.png', './img/apple2.png'],
                         "From left to right, what order should these apples be in?");
-
-                /*game.onWin = function () {
-                 $("#status").text("You Win!");
-                 };*/
-                /*game.onFail = function () {
-                 $("#status").text("Somethings not right...");
-                 };*/
-                /*game.onNormal = function () {
-                 $("#status").text("");
-                 };*/
             });
         </script>
     </body>
