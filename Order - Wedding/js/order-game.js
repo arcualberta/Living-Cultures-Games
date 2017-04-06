@@ -60,31 +60,45 @@
         this.messageHolder.setAttribute("height", height - 20);
     };
 
-    function ArrowRight(color, x, y) {
+    function Heart(color, x, y) {
         this.g = SVGElement('g', {});
-        this.dim = [0.0, 0.0, 0.5, 0.5];
+        this.dim = [0.0, 0.0, 32, 29.6];
+		this.opacity = 1.0;
+		this.scale = 1.0
+		this.speed = (Math.random() + 0.2) / 5000.0;
+		this.aspectRatio = this.dim[2] / this.dim[3];
 
         var path = SVGElement('path', {
-            d: 'm 886.21785,318.23637 -300,-200 0,107.75 -212,0 0,184.5 212,0 0,107.75 300,-200 z',
-            fill: color
+            d: 'M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z',
+            fill: color,
+			viewBox: '0 0 32 29.6'
         });
 
         this.g.appendChild(path);
 
         this.move(x, y);
     }
-    ArrowRight.prototype.move = function (x, y) {
+    Heart.prototype.move = function (x, y) {
         this.dim[0] = x;
         this.dim[1] = y;
         this.update();
     };
-    ArrowRight.prototype.scale = function (width, height) {
-        this.dim[2] = scale;
+    Heart.prototype.setScale = function (scale) {
+        this.scale = scale;
         this.update();
     };
-    ArrowRight.prototype.update = function () {
-
-        $(g).attr('transform', "translate(" + this.dim[0] + "," + this.dim[1] + ") scale(" + this.dim[2] + ")");
+	Heart.prototype.setOpacity = function(newValue) {
+		this.opacity = newValue;
+		this.update();
+	};
+    Heart.prototype.update = function () {
+		var dim = this.dim;
+		var scale = this.scale;
+		var x = dim[0] - ((dim[2] * scale)/2.0);
+		var y = dim[1] - ((dim[3] * scale)/2.0);
+		
+        $(this.g).attr('transform', "translate(" + x + "," + y + ") scale(" + scale + ")");
+		$(this.g).attr('fill-opacity', this.opacity);
     };
 
     function Card(imageId, name, parent) {
@@ -413,7 +427,7 @@
         var y = 20;//height - 120 - 10;
         var x = (width >> 1) - 220;
         for (i = 0; i < this.cards.length; ++i) {
-            this.cards[i].move(x + (i * 90), y);
+            this.cards[i].move(x + (i * 120), y);
             this.cards[i].recalculate();
         }
         
@@ -423,52 +437,45 @@
 
         // Default state actions
         this.onWin = function () {
+			var colors = [
+				'#f93d3d',
+				'#db7a7a',
+				'#b80808'
+			];
+			
             // Create the animation
             var items = [];
             for (var i = 0; i < 30; ++i) {
-                var item = {
-                    element: SVGElement('image', {
-                        'xlink:href': winItems[i % winItems.length],
-                        'width': 44 + i,
-                        'height': 44 + i,
-                        preserveAspectRatio: 'xMidYMid slice'
-                    }),
-                    x: Math.random() * (width - 64),
-                    y: 0 - 64 - (Math.random() * height * 1.5),
-                    rot: Math.random() * 360.0,
-                    v: (60.0 + (((i + 1) / 30) * 50.0)) / 1000.0
-                };
+				
+                var item = new Heart(colors[i % colors.length], 
+					Math.random() * width, Math.random() * height);
+				item.setScale(1.0 / 32.0);
 
-                svgElement.appendChild(item.element);
+                svgElement.appendChild(item.g);
                 items.push(item);
             }
             
             var start = 0;
             var time = 0;
+			var scale = 0;
             var animate = function(timestamp){
                 requestAnimFrame(animate);
-                
                 time = timestamp - start;                
                 start = timestamp;
+				
                 var item;
-                var rot = time * 0.045;
                 for(i = 0; i < items.length; ++i){
                     item = items[i];
-                    
-                    item.y += item.v * time;
-                    
-                    if(item.y > height){
-                        item.y = 0 - 64 - (Math.random() * height);
-                        item.x = Math.random() * (width - 64);
-                    }
-                    
-                    item.rot += rot;
-                    
-                    if(item.rot > 360){
-                        item.rot -= 360;
-                    }
-                    
-                    TransformElement(item.element, item.x, item.y, 32, 32, item.rot);
+                    scale = time * item.speed;
+                    item.setOpacity(item.opacity - scale);
+					item.setScale(item.scale + (scale * 5.0));
+					
+					if(item.opacity <= 0.0){
+						item.opacity = 1.0;
+						item.dim[0] = Math.random() * width;
+						item.dim[1] = Math.random() * height;
+						item.setScale(1.0 / 32.0);
+					}
                 }
             };
             
