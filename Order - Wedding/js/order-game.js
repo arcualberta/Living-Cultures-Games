@@ -424,7 +424,7 @@
         }
 
         // Set the Cards location
-        var y = 20;//height - 120 - 10;
+        var y = 80;//height - 120 - 10;
         var x = (width >> 1) - 220;
         for (i = 0; i < this.cards.length; ++i) {
             this.cards[i].move(x + (i * 120), y);
@@ -433,7 +433,7 @@
         
         // Create the message window
         svgElement.appendChild(this.messageWindow.element);
-        this.messageWindow.resize((width / 2.0) - 150, height - 150, 300, 100);
+        this.messageWindow.resize((width / 2.0) - 200, height - 80, 400, 60);
 
         // Default state actions
         this.onWin = function () {
@@ -492,7 +492,7 @@
                 'stroke-width': 2
             });
 
-            $(text).text("You Win!");
+            $(text).text("Happy Wedding!");
             $(text).hide();
 
             svgElement.appendChild(text);

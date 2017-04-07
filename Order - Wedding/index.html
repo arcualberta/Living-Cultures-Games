@@ -63,12 +63,12 @@
         </style>
     </head>
     <body class="container-fluid">
-        <div class="back-button">
+        <!--<div class="back-button">
             <a href="http://chinaalive.ualberta.ca/index.php/living-in-the-village/"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Back</a>
-        </div>
+        </div>-->
         
-        <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; background: url('./img/mmexport1458673168399.jpg'); background-size: cover; background-position: center">
-            <svg id="game_area" viewBox = "0 0 800 600" style="display: block; margin-left: auto; margin-right: auto; overflow: visible;" height="100%" preserveAspectRatio="xMaxYMax">
+        <div style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; ">
+            <svg id="game_area" viewBox = "0 0 800 600" style="display: block; margin-left: auto; margin-right: auto; overflow: visible; background: url('./img/IMG_0252.jpg'); background-size: cover; background-position: center" height="100%" preserveAspectRatio="xMaxYMax">
 
             </svg>
         </div>
@@ -80,10 +80,10 @@
 
             $(document).ready(function () {
                 game = new Game($('#game_area')[0],
-                        ['./img/IMG_0109.jpg', './img/IMG_0106.jpg', './img/IMG_0103.jpg', './img/IMG_0110.png'],
+                        ['./img/IMG_0170.jpg', './img/IMG_0174.jpg', './img/IMG_0172.jpg', './img/IMG_0177.jpg'],
                         ['Bride\'s House', 'Red Sedan Chair', 'Worship', 'Set Off Head Cover'],
                         ['./img/apple1.png', './img/apple2.png'],
-                        "From left to right, what order should these apples be in?");
+                        "From left to right, what order should these phases be in the wedding ceremony?");
             });
         </script>
     </body>
