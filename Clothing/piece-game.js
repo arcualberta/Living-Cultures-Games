@@ -34,6 +34,7 @@ var Item = function(x, y, width, height){
 	//canvas.attr("draggable", true);
 	div.css("width", "100px");
 	div.css("position", "absolute");
+	div.css("overflow", "hidden");
 	var _this = this;
 
 	div.mousedown(function(event){
@@ -59,12 +60,13 @@ Item.prototype.clickStart = function(x, y){
 	//this.div.focus();
 };
 Item.prototype.clickDrag = function(x, y){
-	if(this.offsetX >= 0){
+	if(this.game.seletedItem == this && this.offsetX >= 0){
 		$(this.div).css("left", (x - this.offsetX) + "px");
 		$(this.div).css("top", (y - this.offsetY) + "px");
 	}
 };
 Item.prototype.clickEnd = function(){
+	this.game.seletedItem = null;
 	this.offsetX = -1;
 	this.offsetY = -1;
 };
@@ -170,6 +172,21 @@ Game.prototype.setPuzzle = function(index){
 	}
 };
 Game.prototype.update = function(){
+	var convertValue = function(r, g, b){
+		var result = Math.max(r, 0) | (Math.max(g, 0) << 8) | (Math.max(b, 0) << 16);
+
+		return result | (0xFF000000);
+	}
+
+	var colour = $("#colourSelect")[0].value;
+	var int = parseInt(colour);
+	var r = 0x000000FF & int;
+	var g = 0x000000FF & (int >> 8);
+	var b = 0x000000FF & (int >> 16);
+
+	this.pallette[0xFFFFFFFF] = int;
+	this.pallette[0xFFAAAAAA] = convertValue(r - 100, g - 110, b - 120);
+
 	var puzzle = this.puzzles[this.current];
 	puzzle.update(this.pallette);
 };
