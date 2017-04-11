@@ -11,6 +11,15 @@
 			#components > canvas {
 				width: 150px;
 			}
+
+			.item > canvas {
+				width: 100%;
+				height: 100%
+			}
+
+			.itme:focus{
+                border: green dotted 1px;
+            }
 		</style>
 	</head>
 	<body class="container-fluid">
@@ -18,16 +27,15 @@
 
 		</div>
 		<div id="mainArea" class="row">
-			<div id="components" class="col-xs-12 col-sm-6 col-md-3">
+			<!--<div id="components" class="col-xs-12 col-sm-6 col-md-3">
 			</div>
 			<div id="outfit" class="col-xs-12 col-sm-6 col-md-9">
-			</div>
+			</div>-->
 		</div>
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 			var game = new Game(
-					document.getElementById("components"),
-					document.getElementById("outfit"),
+					document.getElementById("mainArea"),
 					[
 						new Puzzle("./img/1.png",
 							[
@@ -43,6 +51,8 @@
 
 					]
 				);
+
+			//game.update();
 		</script>
 	</body>
 </html>
