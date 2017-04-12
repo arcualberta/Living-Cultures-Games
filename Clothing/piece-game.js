@@ -1,3 +1,17 @@
+function DragObject() {
+    var dragObject = {};
+
+    this.setData = function (title, data) {
+        dragObject[title] = data;
+    };
+
+    this.getData = function (title) {
+        return dragObject[title];
+    };
+};
+
+var dragObject = new DragObject();
+
 var Palette = function(){
 	this.default = 0xFF000000;
 	this[0xFFFFFFFF] = 0xFFFFAAAA;
@@ -35,9 +49,26 @@ var Item = function(x, y, width, height){
 	div.css("width", "100px");
 	div.css("position", "absolute");
 	div.css("overflow", "hidden");
+	div.attr("draggable", true);
 	var _this = this;
 
-	div.mousedown(function(event){
+	div.bind('dragover touchstart', function (ev) {
+        ev.preventDefault();
+    });
+
+	div.bind('dragstart', function(ev){
+		var event = ev.originalEvent;
+
+        if (event.touches && event.touches.length > 0) {
+            event = event.touches[0];
+        }
+
+        _this.clickStart(event.pageX - $(ev.target).offset().left, event.pageY - $(ev.target).offset().top);
+        dragObject.setData("item", _this);
+
+        return true;
+	});
+	/*div.mousedown(function(event){
 		var rect = _this.div.getBoundingClientRect();
 		_this.clickStart(event.clientX - rect.left, event.clientY - rect.top);
 	});
@@ -46,7 +77,7 @@ var Item = function(x, y, width, height){
 	});
 	$(document).mousemove(function(event){
 		_this.clickDrag(event.pageX, event.pageY);
-	});
+	});*/
 };
 Item.prototype.clickStart = function(x, y){
 	if(this.game.selectedItem != null){
@@ -141,6 +172,21 @@ var Game = function(gameSection, puzzles){
 	this.selectedItem = null;
 
 	this.setPuzzle(0);
+
+	$(gameSection).bind('drop', function(ev){
+		var event = ev.originalEvent;
+		var data = dragData.getData("item");
+		div = $(data.div);
+
+		var x = parseInt(data.offsetX);
+        var y = parseInt(data.offsetY);
+        
+        var scrollX = $(window).scrollLeft();
+        var scrollY = $(window).scrollTop();
+        
+        div.css('left', event.clientX - $(gameSection).offset().left + scrollX - x);
+        div.css('top', event.clientY - $(gameSection).offset().top + scrollY - y);
+	});
 };
 Game.prototype.setPuzzle = function(index){
 	if(index >= 0 && index < this.puzzles.length){
