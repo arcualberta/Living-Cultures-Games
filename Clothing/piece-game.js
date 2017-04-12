@@ -52,9 +52,6 @@ var Item = function(x, y, width, height){
 	div.attr("draggable", true);
 	var _this = this;
 
-	div.bind('dragover touchstart', function (ev) {
-        ev.preventDefault();
-    });
 
 	div.bind('dragstart', function(ev){
 		var event = ev.originalEvent;
@@ -172,6 +169,10 @@ var Game = function(gameSection, puzzles){
 	this.selectedItem = null;
 
 	this.setPuzzle(0);
+
+	$(gameSection).bind('dragover touchstart', function (ev) {
+        ev.preventDefault();
+    });
 
 	$(gameSection).bind('drop', function(ev){
 		var event = ev.originalEvent;
