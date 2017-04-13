@@ -31,7 +31,7 @@ var Item = function(x, y, width, height){
 	this.offsetY = -1;
 	this.div = document.createElement("div");
 
-	this.div.appendChild(this.canvas);
+	//this.div.appendChild(this.canvas);
 
 	var div = $(this.div);
 	div.addClass("item");
@@ -47,8 +47,11 @@ var Item = function(x, y, width, height){
 
 	//canvas.attr("draggable", true);
 	div.css("width", "100px");
+	div.css("height", (100 * (height / width)) + "px");
 	div.css("position", "absolute");
 	div.css("overflow", "hidden");
+    div.css("min-width", "8px");
+    div.css("min-height", "8px");
 	div.attr("draggable", true);
 	var _this = this;
 
@@ -68,6 +71,11 @@ var Item = function(x, y, width, height){
 
 	div.bind('dragend mouseup touchend', function(ev){
 		_this.clickEnd();
+		ev.preventDefault();
+	});
+
+	div.bind('drag', function(event){
+		_this.clickDrag(event.pageX, event.pageY);
 	});
 	/*div.mousedown(function(event){
 		var rect = _this.div.getBoundingClientRect();
@@ -92,9 +100,14 @@ Item.prototype.clickStart = function(x, y){
 	//this.div.focus();
 };
 Item.prototype.clickDrag = function(x, y){
-	if(this.game.seletedItem == this && this.offsetX >= 0){
-		$(this.div).css("left", (x - this.offsetX) + "px");
-		$(this.div).css("top", (y - this.offsetY) + "px");
+	if(this.game.seletedItem == this && this.offsetX >= 0 && this.offsetY >= 0){
+		var newX = x - this.offsetX;
+		var newY = y - this.offsetY;
+
+		if(newX >= 0 && newY >= 0){
+			$(this.div).css("left", newX + "px");
+			$(this.div).css("top", newY + "px");
+		}
 	}
 };
 Item.prototype.clickEnd = function(){
@@ -123,6 +136,9 @@ Item.prototype.update = function(img, pallette){
 	}
 
 	ctx.putImageData(imgData, 0, 0);
+
+	var url = this.canvas.toDataURL('image/png');
+	$(this.div).css("background-image", 'url(' + url + ')');
 };
 
 
@@ -174,7 +190,7 @@ var Game = function(gameSection, puzzles){
 
 	this.setPuzzle(0);
 
-	$(gameSection).bind('dragover touchstart', function (ev) {
+	/*$(gameSection).bind('dragover touchstart', function (ev) {
         //ev.preventDefault();
     });
 
@@ -191,7 +207,7 @@ var Game = function(gameSection, puzzles){
         
         div.css('left', event.clientX - $(gameSection).offset().left + scrollX - x);
         div.css('top', event.clientY - $(gameSection).offset().top + scrollY - y);
-	});
+	});*/
 };
 Game.prototype.setPuzzle = function(index){
 	if(index >= 0 && index < this.puzzles.length){
