@@ -65,16 +65,20 @@ var Item = function(x, y, width, height){
 
         return true;
 	});
+
+	div.bind('dragend mouseup touchend', function(ev){
+		_this.clickEnd();
+	});
 	/*div.mousedown(function(event){
 		var rect = _this.div.getBoundingClientRect();
 		_this.clickStart(event.clientX - rect.left, event.clientY - rect.top);
 	});
 	div.mouseup(function(event){
 		_this.clickEnd();
-	});
+	});*/
 	$(document).mousemove(function(event){
 		_this.clickDrag(event.pageX, event.pageY);
-	});*/
+	});
 };
 Item.prototype.clickStart = function(x, y){
 	if(this.game.selectedItem != null){
@@ -171,7 +175,7 @@ var Game = function(gameSection, puzzles){
 	this.setPuzzle(0);
 
 	$(gameSection).bind('dragover touchstart', function (ev) {
-        ev.preventDefault();
+        //ev.preventDefault();
     });
 
 	$(gameSection).bind('drop', function(ev){
