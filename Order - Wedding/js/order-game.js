@@ -247,12 +247,12 @@
                 ++count;
 
                 if (checkCard !== cards[orderList[i]]) {
-                    return false;
+                    return i;
                 }
             }
         }
 
-        return count === cards.length ? true : null;
+        return count === cards.length ? -1 : null;
     };
     PlayArea.prototype.dropCard = function (card) {
         var i, drop;
@@ -282,7 +282,7 @@
         }
     };
     
-    function Game(svgElement, imageUrls, names, winItems, message) { // the images must be provided in order
+    function Game(svgElement, imageUrls, names, winItems, errorMessage, message) { // the images must be provided in order
         this.cards = [];
         this.orderList = [];
         this.selectedCard = null;
@@ -290,6 +290,7 @@
         this.playArea = null;
         this.state = Game.STATE_PLAYING;
         this.messageWindow = new MessageWindow(message);
+        this.errorMessages = errorMessage;
 
         var point = svgElement.createSVGPoint();
 
@@ -500,8 +501,10 @@
             $(text).show('slow');
         };
 
-        this.onFail = function () {
-            this.messageWindow.setMessage("Something is not right...");
+        this.onFail = function (result) {
+
+            //this.messageWindow.setMessage("Something is not right...");
+            this.messageWindow.setMessage(this.errorMessages[result]);
         };
 
         this.onNormal = function () {
@@ -511,11 +514,11 @@
     Game.prototype.evaluate = function () {
         var result = this.playArea.evaluateCards(this.cards, this.orderList);
 
-        if (result == true) {
+        if (result == -1) {
             this.state = Game.STATE_WIN;
             this.onWin();
-        } else if (result == false) {
-            this.onFail();
+        } else if (result >= 0) {
+            this.onFail(result);
         } else {
             this.onNormal();
         }
