@@ -29,13 +29,23 @@
 			.itme:focus{
                 border: green dotted 1px;
             }
+
+            #outfits > div {
+            	width: 92px;
+            	height: 92px;
+            	background-position: center center;
+				background-size: contain;
+				background-repeat: no-repeat;
+				display: inline-block;
+				cursor: pointer;
+            }
 		</style>
 	</head>
 	<body class="container-fluid">
 		<div id="outfits" class="row">
 
 		</div>
-		<div id="controls" class="row">
+		<!--<div id="controls" class="row">
 			<dl>
 				<dt>
 					Colour
@@ -51,7 +61,7 @@
 						<option value="0xFF33AAFF">Orange</option>
 					</select>
 			<dl>
-		</div>
+		</div>-->
 		<div id="mainArea" class="row">
 			<!--<div id="components" class="col-xs-12 col-sm-6 col-md-3">
 			</div>
@@ -61,20 +71,53 @@
 		<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 			var game = new Game(
+					document.getElementById("outfits"),
 					document.getElementById("mainArea"),
 					[
-						new Puzzle("./img/1.png",
+						new Puzzle("./img/costume1/image3.JPG",
 							[
-								[338, 472, 680, 992],
-								[470, 1648, 432, 234],
-								[1000, 1320, 534, 584],
-								[1102, 572, 356, 432],
-								[1112, 1082, 312, 116],
-								[952, 260, 270, 218],
-								[494, 240, 336, 190]
-							],
-							[1722, 252, 786, 1720]),
-
+								"./img/costume1/1.png",
+								"./img/costume1/2.png",
+								"./img/costume1/3.png",
+								"./img/costume1/4.png",
+								"./img/costume1/5.png"
+							]
+						),
+						new Puzzle("./img/costume2/image2.JPG",
+							[
+								"./img/costume2/1.png",
+								"./img/costume2/2.png",
+								"./img/costume2/3.png",
+								"./img/costume2/4.png",
+								"./img/costume2/5.png",
+								"./img/costume2/6.png",
+								"./img/costume2/7.png",
+								"./img/costume2/8.png",
+								"./img/costume2/9.png"
+							]
+						),
+						new Puzzle("./img/costume3/image5.JPG",
+							[
+								"./img/costume3/1.png",
+								"./img/costume3/2.png",
+								"./img/costume3/3.png",
+								"./img/costume3/4.png",
+								"./img/costume3/5.png",
+								"./img/costume3/6.png"
+							]
+						),
+						new Puzzle("./img/costume4/image4.JPG",
+							[
+								"./img/costume4/1.png",
+								"./img/costume4/2.png",
+								"./img/costume4/3.png",
+								"./img/costume4/6.png",
+								"./img/costume4/7.png",
+								"./img/costume4/8.png",
+								"./img/costume4/9.png",
+								"./img/costume4/10.png"
+							]
+						)
 					]
 				);
 

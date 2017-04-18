@@ -18,22 +18,60 @@ var Palette = function(){
 	this[0xFFAAAAAA] = 0xFFFF3333;
 };
 
-var Item = function(x, y, width, height){
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-	this.canvas = document.createElement("canvas");
-	this.canvas.width = width;
-	this.canvas.height = height;
+var Item = function(imgUrl, scale = 1){
 	this.game = null;
 	this.offsetX = -1;
 	this.offsetY = -1;
 	this.div = document.createElement("div");
-
-	//this.div.appendChild(this.canvas);
+	this.img = new Image();
 
 	var div = $(this.div);
+	var _this = this;
+
+	this.img.onload = function(){
+		var img = _this.img;
+
+		div.css("width", (img.width * scale) + "px");
+		div.css("height", (img.height * scale) + "px");
+
+		div.css("background-image", 'url(' + imgUrl + ')');
+	};
+	this.img.src = imgUrl;
+
+
+	
+};
+Item.prototype.clickStart = function(x, y){
+	if(this.game.selectedItem != null){
+		$(this.game.seletedItem.canvas).focusout();
+	}
+
+	this.offsetX = x;
+	this.offsetY = y;
+
+	this.game.seletedItem = this;
+	//this.div.focus();
+};
+Item.prototype.clickDrag = function(x, y){
+	if(this.game.seletedItem == this && this.offsetX >= 0 && this.offsetY >= 0){
+		var newX = x - this.offsetX;
+		var newY = y - this.offsetY;
+
+		if(newX >= 0 && newY >= 0){
+			$(this.div).css("left", newX + "px");
+			$(this.div).css("top", newY + "px");
+		}
+	}
+};
+Item.prototype.clickEnd = function(){
+	this.game.seletedItem = null;
+	this.offsetX = -1;
+	this.offsetY = -1;
+};
+Item.prototype.update = function(img, pallette){
+	var div = $(this.div);
+
+	//this.div.appendChild(this.canvas);
 	div.addClass("item");
 	div.focusin(function(event){
 		div.css("resize", "both");
@@ -46,8 +84,6 @@ var Item = function(x, y, width, height){
 	});
 
 	//canvas.attr("draggable", true);
-	div.css("width", "100px");
-	div.css("height", (100 * (height / width)) + "px");
 	div.css("position", "absolute");
 	div.css("overflow", "hidden");
     div.css("min-width", "8px");
@@ -88,89 +124,25 @@ var Item = function(x, y, width, height){
 		_this.clickDrag(event.pageX, event.pageY);
 	});
 };
-Item.prototype.clickStart = function(x, y){
-	if(this.game.selectedItem != null){
-		$(this.game.seletedItem.canvas).focusout();
-	}
-
-	this.offsetX = x;
-	this.offsetY = y;
-
-	this.game.seletedItem = this;
-	//this.div.focus();
-};
-Item.prototype.clickDrag = function(x, y){
-	if(this.game.seletedItem == this && this.offsetX >= 0 && this.offsetY >= 0){
-		var newX = x - this.offsetX;
-		var newY = y - this.offsetY;
-
-		if(newX >= 0 && newY >= 0){
-			$(this.div).css("left", newX + "px");
-			$(this.div).css("top", newY + "px");
-		}
-	}
-};
-Item.prototype.clickEnd = function(){
-	this.game.seletedItem = null;
-	this.offsetX = -1;
-	this.offsetY = -1;
-};
-Item.prototype.update = function(img, pallette){
-	var ctx = this.canvas.getContext("2d");
-	
-	ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	ctx.drawImage(img, this.x, this.y, this.width, this.height, 0, 0, this.canvas.width, this.canvas.height);
-
-	var imgData = ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-	var data = new Uint32Array(imgData.data.buffer);
-	var size = data.length;
-
-	for(var i = 0; i < size; ++i){
-		if(data[i] > 0){
-			if(pallette[data[i]]){
-				data[i] = pallette[data[i]];
-			}else{
-				data[i] = data[i] & pallette.default;
-			}
-		}
-	}
-
-	ctx.putImageData(imgData, 0, 0);
-
-	var url = this.canvas.toDataURL('image/png');
-	$(this.div).css("background-image", 'url(' + url + ')');
-};
 
 
-var Puzzle = function(imgUrl, componentDimensions, mainDemension){
+var Puzzle = function(imgUrl, componentImages){
 	this.loaded = false;
 	this.image = new Image();
 	this.items = [];
-	this.main = {
-		dim: mainDemension,
-		canvas: document.createElement("canvas")
-	};
 
-	this.main.canvas.width = mainDemension[2];
-	this.main.canvas.height = mainDemension[3];
-
+	var _this = this;
 	this.image.onload = function(){
-		this.loaded = true;
+		_this.loaded = true;
 	};
 	this.image.src = imgUrl;
 
-	for(var i = 0; i < componentDimensions.length; ++i){
-		var dim = componentDimensions[i];
-		this.items.push(new Item(dim[0], dim[1], dim[2], dim[3], game));
+	for(var i = 0; i < componentImages.length; ++i){
+		var dim = componentImages[i];
+		this.items.push(new Item(dim, 0.25));
 	}
 };
 Puzzle.prototype.update = function(palette){
-	var dim = this.main.dim;
-	var canvas = this.main.canvas;
-	var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.drawImage(this.image, dim[0], dim[1], dim[2], dim[3], 0, 0, canvas.width, canvas.height);
-
 	for(var i = 0; i < this.items.length; ++i){
 		this.items[i].update(this.image, palette);
 	}
@@ -181,7 +153,7 @@ Puzzle.prototype.setGame = function(game){
 	}
 };
 
-var Game = function(gameSection, puzzles){
+var Game = function(selectSection, gameSection, puzzles){
 	this.pallette = new Palette();
 	this.puzzles = puzzles;
 	this.current = 0;
@@ -208,6 +180,20 @@ var Game = function(gameSection, puzzles){
         div.css('left', event.clientX - $(gameSection).offset().left + scrollX - x);
         div.css('top', event.clientY - $(gameSection).offset().top + scrollY - y);
 	});*/
+
+	var _this = this;
+	for(var i = 0; i < puzzles.length; ++i){
+		var div = $("<div></div>");
+		div.click((function(inVal){
+			return function(){ _this.setPuzzle(inVal); };
+		})(i));
+
+		div.css("background-image", 'url(' + puzzles[i].image.src + ')');
+
+		$(selectSection).append(div);
+
+		this.puzzles[i].setGame(this);
+	}
 };
 Game.prototype.setPuzzle = function(index){
 	if(index >= 0 && index < this.puzzles.length){
@@ -215,22 +201,22 @@ Game.prototype.setPuzzle = function(index){
 		this.update();
 
 		var puzzle = this.puzzles[index];
-		puzzle.setGame(this);
-		this.gameSection.innerHtml = "";
+		puzzle.update(this.pallette);
+		$(this.gameSection).empty();
 
 		var width = $(document).innerWidth();
 		var height = $(document).innerHeight();
 
-		$(puzzle.main.canvas).css("position", 'absolute');
-		$(puzzle.main.canvas).css("top", '25px');
-		$(puzzle.main.canvas).css("left", (width / 2.0) + 'px');
-		$(puzzle.main.canvas).css("height", (height - 50) + 'px');
+		$(puzzle.image).css("position", 'absolute');
+		$(puzzle.image).css("top", '93px');
+		$(puzzle.image).css("left", (width / 2.0) + 'px');
+		$(puzzle.image).css("height", (height - 150) + 'px');
 
-		this.gameSection.appendChild(puzzle.main.canvas);
+		this.gameSection.appendChild(puzzle.image);
 
 		for(var i = 0; i < puzzle.items.length; ++i){
 			var item = $(puzzle.items[i].div);
-			item.css("top", (Math.random() * (height - 60)) + 'px');
+			item.css("top", (Math.random() * (height - 192) + 92) + 'px');
 			item.css("left", (Math.random() * (width / 2.0)) + 'px');
 
 			item.attr('tabindex', (i + 1));
@@ -245,14 +231,14 @@ Game.prototype.update = function(){
 		return result | (0xFF000000);
 	}
 
-	var colour = $("#colourSelect")[0].value;
+	/*var colour = $("#colourSelect")[0].value;
 	var int = parseInt(colour);
 	var r = 0x000000FF & int;
 	var g = 0x000000FF & (int >> 8);
 	var b = 0x000000FF & (int >> 16);
 
 	this.pallette[0xFFFFFFFF] = int;
-	this.pallette[0xFFAAAAAA] = convertValue(r - 100, g - 110, b - 120);
+	this.pallette[0xFFAAAAAA] = convertValue(r - 100, g - 110, b - 120);*/
 
 	var puzzle = this.puzzles[this.current];
 	puzzle.update(this.pallette);
