@@ -1,223 +1,172 @@
-function guid() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-7xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-    return uuid;
-}
 
-function createDragFunction(img, parent, dragObject) {
-    return function (ev) {
-        var event = ev.originalEvent;
+requestAnimFrame = (function (callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+                function (callback) {
+                    window.setTimeout(callback, maxFrameRate);
+                };
+    })();
 
-        if (event.touches && event.touches.length > 0) {
-            event = event.touches[0];
+var Game = function(allObjects, matchingPairs, itemsId1, itemsId2, canvasId){
+    this.init(allObjects, matchingPairs, itemsId1, itemsId2, canvasId);
+};
+{
+    function addPair(allObject, pair){
+        var _this = this;
+        var img1 = new Image();
+        img1.src = allObject[pair[0]];
+        $(img1).attr("data-name", pair[0]);
+
+        $(img1).mousedown(function(event){
+            var item = $("[data-name='" + pair[0] + "']");
+            var offset = item.offset();
+
+            _this.selectedItem.isSelected = true;
+            _this.selectedItem.isItem1 = true;
+            _this.selectedItem.name = pair[0];
+            _this.selectedItem.mouse[0] = offset.left + (item.innerWidth() / 2.0);
+            _this.selectedItem.mouse[1] = offset.top + (item.innerHeight() / 2.0);
+        });
+        $(img1).mouseup(function(){
+            if(!_this.selectedItem.isItem1 && _this.selectedItem.isSelected){
+                _this.checkPairs[pair[0]] = _this.selectedItem.name;
+                _this.evaluate();
+            }
+            _this.selectedItem.isSelected = false;
+            _this.selectedItem.name = null;
+        });
+
+        var img2 = new Image();
+        img2.src = allObject[pair[1]];
+        $(img2).attr("data-name", pair[1]);
+
+        $(img2).mousedown(function(event){
+            var item = $("[data-name='" + pair[1] + "']");
+            var offset = item.offset();
+
+            _this.selectedItem.isSelected = true;
+            _this.selectedItem.isItem1 = false;
+            _this.selectedItem.name = pair[1];
+            _this.selectedItem.mouse[0] = offset.left + (item.innerWidth() / 2.0);
+            _this.selectedItem.mouse[1] = offset.top + (item.innerHeight() / 2.0);
+        });
+        $(img2).mouseup(function(){
+            if(_this.selectedItem.isItem1 && _this.selectedItem.isSelected){
+                _this.checkPairs[_this.selectedItem.name] = pair[1];
+                _this.evaluate();
+            }
+            _this.selectedItem.isSelected = false;
+            _this.selectedItem.name = null;
+        });
+
+        return [img1, img2];
+    };
+
+    function shuffleArray(inArray){
+        for(var i = 0; i < inArray.length; ++i){
+            var newId = Math.floor(Math.random() * inArray.length);
+            var temp = inArray[i];
+            inArray[i] = inArray[newId];
+            inArray[newId] = temp;
+        }
+    }
+
+    function drawLoop(){
+        var _this = this;
+
+        var draw = function(){
+            requestAnimFrame(draw);
+            var height = _this.items1Div.innerHeight();
+            var canvas = _this.canvas[0];
+            
+            if(height != canvas.height){
+                canvas.height = height;
+            }
+
+            var context = canvas.getContext("2d");
+            var pairs = _this.checkPairs;
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.beginPath();
+            for(var key in pairs){
+                if(pairs[key]){
+                    var item1 = $("[data-name='" + key + "']");
+                    var item2 = $("[data-name='" + pairs[key] + "']");
+
+                    if(item1.length > 0 && item2.length > 0){
+                        context.moveTo(0, item1.offset().top + (item1.innerHeight() / 2.0));
+                        context.lineTo(canvas.width, item2.offset().top + (item2.innerHeight() / 2.0));
+                    }
+                }
+            }
+            if(_this.selectedItem.isSelected){
+                var offset = _this.canvas.offset();
+                context.moveTo(_this.selectedItem.mouse[0] - offset.left, _this.selectedItem.mouse[1] - offset.top);
+                context.lineTo(_this.mouseLocation[0] - offset.left, _this.mouseLocation[1] - offset.top);
+            }
+            context.stroke();
+        };
+
+        draw();
+    }
+
+    Game.prototype.init = function(allObjects, matchingPairs, itemsId1, itemsId2, canvasId) {
+        var _this = this;
+
+        this.items1 = [];
+        this.items2 = [];
+
+        this.checkPairs = {};
+        this.matchingPairs = matchingPairs;
+        this.selectedItem = {
+            isSelected: false,
+            isItem1: false,
+            name: null,
+            mouse: [0, 0]
+        };
+        this.mouseLocation = [0, 0];
+
+        this.canvas = $(canvasId);
+        this.items1Div = $(itemsId1);
+
+        for(var i = 0; i < matchingPairs.length; ++i){
+            this.checkPairs[matchingPairs[i][0]] = null;
+            var pair = addPair.call(this, allObjects, matchingPairs[i]);
+            this.items1.push(pair[0]);
+
+            this.items2.push(pair[1]);
         }
 
-        event.dataTransfer.setData('Text', ev.target.id); // This is used to allow object dragging in firefox.
+        shuffleArray(this.items1);
+        shuffleArray(this.items2);
 
-        dragObject.setData("Text", ev.target.id);
-        dragObject.setData("x", event.pageX - $(ev.target).offset().left);
-        dragObject.setData("y", event.pageY - $(ev.target).offset().top);
-        dragObject.setData("parent", parent);
-        
+        for(var i = 0; i < this.items1.length; ++i){
+            $(this.items1[i]).attr("draggable", false);
+            $(this.items2[i]).attr("draggable", false);
+
+            $(itemsId1).append($(this.items1[i]));
+            $(itemsId2).append($(this.items2[i]));
+        }
+
+        $(document).mousemove(function(event){
+            _this.setMouseLocation(event.pageX, event.pageY);
+        });
+
+        drawLoop.call(this);
+    };
+    Game.prototype.setMouseLocation = function(x, y){
+        this.mouseLocation[0] = x;
+        this.mouseLocation[1] = y;
+    };
+    Game.prototype.evaluate = function(){
+        for(var i  = 0; i < this.matchingPairs.length; ++i){
+            var pair = this.matchingPairs[i];
+            if(this.checkPairs[pair[0]] != pair[1]){
+                return false;
+            }
+        }
+
+        this.onwin();
         return true;
     };
 }
-
-function DragObject() {
-    var dragObject = {};
-
-    this.setData = function (title, data) {
-        dragObject[title] = data;
-    };
-
-    this.getData = function (title) {
-        return dragObject[title];
-    };
-}
-
-function RoomDiv(div, required, name){
-	this.name = name;
-	this.div = div;
-	this.required = required;
-	
-	div.css('flex', '1');
-	div.css('border', 'black dashed 1px');
-	
-	div.append($("<h2>" + name + "</h2>"));
-}
-
-function Game(objects, requiredObjects, imagePanelId, roomDivId) {
-    var _this = this;
-    var tabIndex = 0;
-    var dragData = new DragObject();
-    var touchStart = 0;
-    this.requiredObjects = requiredObjects;
-    this.checkArray = [];
-
-    // Private funcitons
-    var attachResizeFunction = function (div) {
-        div.focusin(function (event) {
-            div.css("resize", "both");
-        });
-
-        div.focusout(function (event) {
-            div.css("resize", "none");
-        });
-    };
-
-    // Add touchend event
-    $(document).on("touchstart", function (ev) {
-        touchStart = Date.now();
-    });
-    $(document).on("touchend", function (ev) {
-        if (touchStart > 0 && Date.now() - touchStart > 301) {
-            touchStart = -1;
-            var x = ev.originalEvent.changedTouches[0].pageX - window.pageXOffset;
-            var y = ev.originalEvent.changedTouches[0].pageY - window.pageYOffset;
-            var target = document.elementFromPoint(x, y);
-
-            if (target) {
-                $(target).trigger({
-                    type: "drop",
-                    originalEvent: ev.originalEvent.changedTouches[0]
-                });
-            }
-        }else{
-            touchStart = -1;
-            var x = ev.originalEvent.changedTouches[0].pageX - window.pageXOffset;
-            var y = ev.originalEvent.changedTouches[0].pageY - window.pageYOffset;
-            var target = document.elementFromPoint(x, y);
-            
-            $(target).focus();
-        }
-    });
-
-    // Setup the main div
-    var roomDiv = $('#' + roomDivId);
-	this.rooms = [];
-	for(var i = 0; i < requiredObjects.length; ++i){
-		var newDiv = $("<div></div>");
-		this.rooms.push(new RoomDiv(newDiv, requiredObjects[i].required, requiredObjects[i].name));
-		roomDiv.append(newDiv);
-	}
-    roomDiv.bind('dragover touchstart', function (ev) {
-        ev.preventDefault();
-    });
-
-    roomDiv.bind('drop', function (ev) {
-        var event = ev.originalEvent;
-        
-        ev.preventDefault();
-        var data = dragData.getData("Text");
-        var parent = dragData.getData("parent");
-
-        var div;
-        if (parent === roomDivId) {
-            div = $('#' + data);
-        } else {
-            div = $("<div></div>");
-            div.attr('id', guid());
-            div.attr('tabindex', ++tabIndex);
-            div.bind('dragstart', new createDragFunction(div, roomDivId, dragData));
-            div.bind('touchstart', new createDragFunction(div, roomDivId, dragData));
-            div.css('position', 'absolute');
-            div.attr("draggable", true);
-            div.css("overflow", "hidden");
-            div.css("min-width", "8px");
-            div.css("min-height", "8px");
-            div.css("background-repeat", "no-repeat");
-            div.css("background-size", "100% 100%");
-            div.css("-khtml-user-drag", "element");
-
-            var img = $('#' + data);
-            div.attr("data", img.attr("data"));
-            div.css("background-image", "url(" + img.attr("src") + ")");
-            div.css("width", img.innerWidth() + "px");
-            div.css("height", img.innerHeight() + "px");
-
-            roomDiv.append(div);
-
-            attachResizeFunction(div);
-        }
-
-        var x = parseInt(dragData.getData("x"));
-        var y = parseInt(dragData.getData("y"));
-        
-        var scrollX = $(window).scrollLeft();
-        var scrollY = $(window).scrollTop();
-        
-        div.css('left', event.clientX - roomDiv.offset().left + scrollX - x);
-        div.css('top', event.clientY - roomDiv.offset().top + scrollY - y);
-
-        _this.check();
-    });
-
-    // Setup the images
-    var imagePanel = $('#' + imagePanelId);
-    imagePanel.bind('dragover touchstart', function (ev) {
-        ev.preventDefault();
-    });
-    imagePanel.bind('drop', function (ev) {
-        var event = ev.originalEvent;
-        ev.preventDefault();
-        var data = dragData.getData("Text");
-        var parent = dragData.getData("parent");
-
-        if (parent === roomDivId) {
-            var img = $('#' + data);
-            img.remove();
-        }
-
-        _this.check();
-    });
-
-    for (var key in objects) {
-        var value = objects[key];
-
-        var img = new Image();
-        $(img).attr('data', key);
-        $(img).attr('draggable', true);
-        $(img).attr('id', guid());
-        $(img).addClass('gameImage');
-        $(img).bind('dragstart', new createDragFunction(img, imagePanelId, dragData));
-        $(img).bind('touchstart', new createDragFunction(img, imagePanelId, dragData));
-
-        img.src = value;
-
-        imagePanel.append(img);
-    }
-
-    this.roomDiv = roomDiv;
-}
-;
-Game.prototype.check = function () {
-    var _this = this;
-    var bad = false;
-    var length = _this.requiredObjects.length;
-    var matchedList = _this.checkArray;
-    matchedList.length = 0;
-
-	for(var i = 0; i < this.rooms.length; ++i){
-		
-	}
-
-    if (bad) {
-        this.onbadobject();
-    } else if (matchedList.length === length) {
-        this.onwin();
-    }else{
-        this.onnostate();
-    }
-};
-Game.prototype.onwin = function () {
-};
-Game.prototype.onbadobject = function () {
-
-};
-Game.prototype.onnostate = function () {
-
-};
