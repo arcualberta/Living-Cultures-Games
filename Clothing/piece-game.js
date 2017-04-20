@@ -12,34 +12,28 @@ function DragObject() {
 
 var dragObject = new DragObject();
 
-var Palette = function(){
-	this.default = 0xFF000000;
-	this[0xFFFFFFFF] = 0xFFFFAAAA;
-	this[0xFFAAAAAA] = 0xFFFF3333;
-};
-
 var Item = function(imgUrl, scale = 1){
 	this.game = null;
 	this.offsetX = -1;
 	this.offsetY = -1;
 	this.div = document.createElement("div");
 	this.img = new Image();
+	this.scale = scale;
+	this.imgUrl = imgUrl;
+	this.loaded = false;
 
 	var div = $(this.div);
 	var _this = this;
 
 	this.img.onload = function(){
-		var img = _this.img;
-
-		div.css("width", (img.width * scale) + "px");
-		div.css("height", (img.height * scale) + "px");
+		_this.loaded = true;
+		_this.updateSize();
 
 		div.css("background-image", 'url(' + imgUrl + ')');
-	};
-	this.img.src = imgUrl;
-
-
-	
+	};	
+};
+Item.prototype.loadImage = function(){
+	this.img.src = this.imgUrl;
 };
 Item.prototype.clickStart = function(x, y){
 	if(this.game.selectedItem != null){
@@ -68,8 +62,19 @@ Item.prototype.clickEnd = function(){
 	this.offsetX = -1;
 	this.offsetY = -1;
 };
-Item.prototype.update = function(img, pallette){
+Item.prototype.updateSize = function(){
+	var img = this.img;
+	var scale = this.scale;
 	var div = $(this.div);
+
+	div.css("width", (img.width * scale) + "px");
+	div.css("height", (img.height * scale) + "px");
+}
+Item.prototype.update = function(img, scale){
+	var div = $(this.div);
+	this.scale = scale;
+
+	this.updateSize();
 
 	//this.div.appendChild(this.canvas);
 	div.addClass("item");
@@ -98,6 +103,8 @@ Item.prototype.update = function(img, pallette){
         if (event.touches && event.touches.length > 0) {
             event = event.touches[0];
         }
+
+        event.dataTransfer.setDragImage(_this.img, -99999, -99999);
 
         _this.clickStart(event.pageX - $(ev.target).offset().left, event.pageY - $(ev.target).offset().top);
         dragObject.setData("item", _this);
@@ -130,21 +137,35 @@ var Puzzle = function(imgUrl, componentImages){
 	this.loaded = false;
 	this.image = new Image();
 	this.items = [];
+	this.drawHeight = $(document).innerHeight();
+	this.drawScale = 1.0;
+	this.imgUrl = imgUrl;
 
 	var _this = this;
 	this.image.onload = function(){
 		_this.loaded = true;
+		_this.update();
+
+		for(var i = 0; i < _this.items.length; ++i){
+			_this.items[i].loadImage();
+		}
 	};
-	this.image.src = imgUrl;
+	
 
 	for(var i = 0; i < componentImages.length; ++i){
 		var dim = componentImages[i];
 		this.items.push(new Item(dim, 0.25));
 	}
+
+	this.image.src = this.imgUrl;
 };
-Puzzle.prototype.update = function(palette){
+Puzzle.prototype.update = function(){
+	if(this.image.height > 0){
+		this.drawScale = this.drawHeight / this.image.height;
+	}
+
 	for(var i = 0; i < this.items.length; ++i){
-		this.items[i].update(this.image, palette);
+		this.items[i].update(this.image, this.drawScale);
 	}
 };
 Puzzle.prototype.setGame = function(game){
@@ -154,13 +175,10 @@ Puzzle.prototype.setGame = function(game){
 };
 
 var Game = function(selectSection, gameSection, puzzles){
-	this.pallette = new Palette();
 	this.puzzles = puzzles;
 	this.current = 0;
 	this.gameSection = gameSection;
 	this.selectedItem = null;
-
-	this.setPuzzle(0);
 
 	/*$(gameSection).bind('dragover touchstart', function (ev) {
         //ev.preventDefault();
@@ -182,6 +200,7 @@ var Game = function(selectSection, gameSection, puzzles){
 	});*/
 
 	var _this = this;
+	var outDiv = null;
 	for(var i = 0; i < puzzles.length; ++i){
 		var div = $("<div></div>");
 		div.click((function(inVal){
@@ -193,7 +212,15 @@ var Game = function(selectSection, gameSection, puzzles){
 		$(selectSection).append(div);
 
 		this.puzzles[i].setGame(this);
+
+		if(i == 0){
+			outDiv = div;
+		}
 	}
+
+	setTimeout(function(){
+		outDiv.click();
+	}, 1000);
 };
 Game.prototype.setPuzzle = function(index){
 	if(index >= 0 && index < this.puzzles.length){
@@ -201,20 +228,27 @@ Game.prototype.setPuzzle = function(index){
 		this.update();
 
 		var puzzle = this.puzzles[index];
-		puzzle.update(this.pallette);
 		$(this.gameSection).empty();
 
 		var width = $(document).innerWidth();
 		var height = $(document).innerHeight();
 
+		puzzle.drawHeight = height - 150;
+
 		$(puzzle.image).css("position", 'absolute');
 		$(puzzle.image).css("top", '93px');
 		$(puzzle.image).css("left", (width / 2.0) + 'px');
-		$(puzzle.image).css("height", (height - 150) + 'px');
+		$(puzzle.image).css("height", puzzle.drawHeight + 'px');
+
+
+		puzzle.update();
 
 		this.gameSection.appendChild(puzzle.image);
 
 		for(var i = 0; i < puzzle.items.length; ++i){
+			puzzle.items[i].scale = puzzle.drawScale;
+			puzzle.items[i].updateSize();
+
 			var item = $(puzzle.items[i].div);
 			item.css("top", (Math.random() * (height - 192) + 92) + 'px');
 			item.css("left", (Math.random() * (width / 2.0)) + 'px');
@@ -241,5 +275,5 @@ Game.prototype.update = function(){
 	this.pallette[0xFFAAAAAA] = convertValue(r - 100, g - 110, b - 120);*/
 
 	var puzzle = this.puzzles[this.current];
-	puzzle.update(this.pallette);
+	puzzle.update();
 };
