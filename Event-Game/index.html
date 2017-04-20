@@ -44,9 +44,14 @@
         <div id="messagePanel">Test</div>
 
         <div class="row">
-            <div id="items1" class="col-xs-4 imgSelect"></div>
-            <canvas id="lines" class="col-xs-4 imgSelect"></canvas>
-            <div id="items2" class="col-xs-4 imgSelect"></div>
+            <svg id="gameArea" viewBox="0 0 800 600">
+            </svg>
+
+            <div id="items1" class="col-xs-3 imgSelect"></div>
+            <canvas id="lines1" class="col-xs-2 imgSelect"></canvas>
+            <div id="mains" class="col-xs-2 imgSelect"></div>
+            <canvas id="lines2" class="col-xs-2 imgSelect"></canvas>
+            <div id="items2" class="col-xs-3 imgSelect"></div>
         </div>
 
 
@@ -68,14 +73,14 @@
 					'Lantern': 'img/IMG_0208.jpg',
                 };
 
-                var matchingPairs = [
-                    ['Rice Dumpling', 'Dragon Boat'],
-                    ['Dumpling', 'Red Banner'],
-                    ['Small Dumpling Ball', 'Lantern'],
-                    ['Mooncake', 'Full Moon']
-                ]
+                var matchingPairs = {
+                    'Dragon Boat Festival': ['Rice Dumpling', 'Dragon Boat'],
+                    'Chinese New Year Day': ['Dumpling', 'Red Banner'],
+                    'Lantern Festival': ['Small Dumpling Ball', 'Lantern'],
+                    'Mid-Autumn Festival': ['Mooncake', 'Full Moon']
+                }
 
-                game = new Game(allObjects, matchingPairs, '#items1', '#items2', '#lines');
+                game = new Game(allObjects, matchingPairs, 800, 600, '#gameArea');
                 game.onwin = function () {
                     messagePanel.text("You Win!");
                     messagePanel.show();
