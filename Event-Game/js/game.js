@@ -140,8 +140,12 @@ var Event = function(name, width, height, game){
             clickStart.call(_this);
         });
 
-        $(this.element).bind("touchend mouseup", function(){
+        $(this.element).bind("mouseup", function(){
             clickEnd.call(_this);
+        });
+
+        $(this.element).bind("touchend", function(ev){
+            _this.game.handleTouchEnd(ev);
         });
     };
     Event.prototype.move = function (x, y) {
@@ -243,8 +247,12 @@ var Item = function(name, imageUrl, imageId, width, height, game){
             clickStart.call(_this);
         });
 
-        $(this.element).bind("touchend mouseup", function(){
+        $(this.element).bind("mouseup", function(){
             clickEnd.call(_this);
+        });
+
+        $(this.element).bind("touchend", function(ev){
+            _this.game.handleTouchEnd(ev);
         });
     };
     Item.prototype.move = function (x, y) {
@@ -356,6 +364,24 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
                 _this.activeLine.moveEnd(result.x, result.y);
             }
         });
+
+        this.svg.bind('touchmove', function (ev) {
+            var event = ev.originalEvent.touches[0];
+            if(_this.activeLine != null){
+                var result = getConvertedPoint.call(_this, event.clientX, event.clientY);
+
+                _this.activeLine.moveEnd(result.x, result.y);
+            }
+        });
+    };
+    Game.prototype.handleTouchEnd = function(ev){
+        var event = ev.originalEvent.changedTouches[0];
+
+        var element = document.elementFromPoint(event.clientX, event.clientY);
+
+        if(element){
+            $(element).trigger("mouseup");
+        }
     };
     Game.prototype.evaluate = function(){
         var result = true;
