@@ -196,13 +196,18 @@ Game.prototype.check = function () {
     var length = _this.requiredObjects.length;
     var matchedList = _this.checkArray;
     matchedList.length = 0;
+    var totalWrong = 0;
+    var totalRight = 0;
 
     this.roomDiv.children("[data]").each(function () {
         var data = $(this).attr('data');
         var newBad = true;
+        
 
         for (var i = 0; i < length; ++i) {
             if (data === _this.requiredObjects[i]) {
+                ++totalRight;
+
                 if (matchedList.indexOf(data) < 0) {
                     matchedList.push(data);
                 }
@@ -212,15 +217,19 @@ Game.prototype.check = function () {
             }
         }
 
+        if(newBad){
+            ++totalWrong;
+        }
+
         bad = bad || newBad;
     });
 
     if (bad) {
-        this.onbadobject();
-    } else if (matchedList.length === length) {
-        this.onwin();
+        this.onbadobject(totalRight, totalWrong);
+    } else if (totalRight === length) {
+        this.onwin(totalRight, totalWrong);
     }else{
-        this.onnostate();
+        this.onnostate(totalRight, totalWrong);
     }
 };
 Game.prototype.onwin = function () {

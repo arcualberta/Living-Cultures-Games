@@ -38,20 +38,42 @@
                 font-size: 8em;
                 display: none;
             }
+
+            #gameArea {
+                width: 100%;
+            }
+
+            p {
+                -webkit-user-select: none;
+                -ms-user-select: none;
+                -o-user-select: none;
+                user-select: none;
+            }
+
+            .card-text{
+                text-align: center;
+                vertical-align: bottom;
+                color: #FFFFDD;
+                font-weight: bold;
+                text-shadow: 0px 0px 5px #AA0000;
+                
+                user-select: none;
+                -moz-user-select: none;
+                -khtml-user-select: none;
+                -webkit-user-select: none;
+                -o-user-select: none;
+                
+                pointer-events: none;
+                cursor: default;
+            }
         </style>
     </head>
     <body class="container-fluid">
         <div id="messagePanel">Test</div>
 
         <div class="row">
-            <svg id="gameArea" viewBox="0 0 800 600">
+            <svg id="gameArea" viewBox="0 0 1280 720">
             </svg>
-
-            <div id="items1" class="col-xs-3 imgSelect"></div>
-            <canvas id="lines1" class="col-xs-2 imgSelect"></canvas>
-            <div id="mains" class="col-xs-2 imgSelect"></div>
-            <canvas id="lines2" class="col-xs-2 imgSelect"></canvas>
-            <div id="items2" class="col-xs-3 imgSelect"></div>
         </div>
 
 
@@ -80,7 +102,7 @@
                     'Mid-Autumn Festival': ['Mooncake', 'Full Moon']
                 }
 
-                game = new Game(allObjects, matchingPairs, 800, 600, '#gameArea');
+                game = new Game(allObjects, matchingPairs, 1280, 720, '#gameArea');
                 game.onwin = function () {
                     messagePanel.text("You Win!");
                     messagePanel.show();

@@ -52,6 +52,28 @@
                 background-size: contain;
                 background-position-x: center;
             }
+
+            #correctPanel {
+                position: absolute;
+                top: 0;
+                left: 5px;
+                height: 20%;
+                text-align: left;
+                vertical-align: center;
+                font-size: 2em;
+                color: green;
+            }
+
+            #wrongPanel {
+                position: absolute;
+                top: 0;
+                right: 5px;
+                height: 20%;
+                text-align: right;
+                vertical-align: center;
+                font-size: 2em;
+                color: red;
+            }
         </style>
     </head>
     <body class="container-fluid">
@@ -63,7 +85,9 @@
         <div class="row">
             <div class="col-xs-12 horizontal-center">
                 <div id="roomPanel" class="pagination-centered">
+                    <div id="correctPanel"></div>
                     <div id="messagePanel"></div>
+                    <div id="wrongPanel"></div>
                 </div>
             </div>
         </div>
@@ -73,7 +97,13 @@
         <script type="text/javascript">
             var game;
 
+            function setScore(correct, incorrect){
+                $("#correctPanel").text("CORRECT " + correct);
+                $("#wrongPanel").text(incorrect + " INCORRECT");
+            }
+
             $(document).ready(function () {
+                setScore(0, 0);
                 var allObjects = {
                     '1': './img/1.jpg',
                     '2': './img/2.jpg',
@@ -88,13 +118,16 @@
                 var requiredObjects = ['1', '2', '3', '4', '5'];
                 game = new Game(allObjects, requiredObjects, '', 'imagePanel', 'roomPanel');
                 var messagePanel = $("#messagePanel");
-                game.onwin = function () {
+                game.onwin = function (correct, incorrect) {
+                    setScore(correct, incorrect);
                     messagePanel.css("background-image", "url(./img/smile.png)");
                 };
-                game.onbadobject = function () {
+                game.onbadobject = function (correct, incorrect) {
+                    setScore(correct, incorrect);
                     messagePanel.css("background-image", "url(./img/frown.png)");
                 };
-                game.onnostate = function () {
+                game.onnostate = function (correct, incorrect) {
+                    setScore(correct, incorrect);
                     messagePanel.css("background-image", "none");
                 };
             });
