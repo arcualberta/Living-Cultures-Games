@@ -120,10 +120,10 @@ var Event = function(name, width, height, game){
         this.element.appendChild(rect);
 
         var foreignObject = SVGElement('foreignObject', {
-            x: 0,
-            y: this.dim[3] / 2.0,
-            width: this.dim[2],
-            height: this.dim[3] / 2.0
+            x: 4,
+            y: 8,
+            width: this.dim[2] - 8,
+            height: this.dim[3] - 16
         });
 
         this.element.appendChild(foreignObject);
@@ -238,6 +238,8 @@ var Item = function(name, imageUrl, imageId, width, height, game){
         var p = $("<p class='card-text'></p>");
         p.text(this.name);
         p.off("click");
+
+        this.textElement = $(p);
 
         foreignObject.appendChild(p[0]);
 
@@ -442,5 +444,14 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
     };
     Game.prototype.onwin = function(){
         console.log("WIN");
+    }
+    Game.prototype.setSubtitles = function(subtitles){
+        for(var key in subtitles){
+            var item = this.items[key];
+
+            if(item){
+                item.textElement.text(item.name + " - " + subtitles[key]);
+            }
+        }
     }
 }
