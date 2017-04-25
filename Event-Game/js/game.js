@@ -356,6 +356,25 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
             this.svg.append(bottomItems[i].element);
         }
 
+
+        var foreignObject = SVGElement('foreignObject', {
+            x: (width / 2) - 100,
+            y: (height / 2) + 50,
+            width: 200,
+            height: 60
+        });
+
+        this.svg.append(foreignObject);
+
+        var p = $("<p class='info-message'></p>");
+        p.text(this.name);
+        p.off("click");
+        p.css("display", "none");
+
+        this.textElement = p;
+
+        foreignObject.appendChild(p[0]);
+
         // Events
         var _this = this;
         this.svg.mousemove(function(ev){
@@ -408,7 +427,11 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
         if(result){
             if(result = trueCount == this.matchingCount){
                 this.onwin();
+            }else{
+                this.onok();
             }
+        }else{
+            this.onfail();
         }
 
         return result;
@@ -445,6 +468,12 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
     Game.prototype.onwin = function(){
         console.log("WIN");
     }
+    Game.prototype.onfail = function(){
+        console.log("FAIL");
+    }
+    Game.prototype.onok = function(){
+        console.log("OK");
+    }
     Game.prototype.setSubtitles = function(subtitles){
         for(var key in subtitles){
             var item = this.items[key];
@@ -452,6 +481,16 @@ var Game = function(allObjects, matchingPairs, width, height, svgAreaPath){
             if(item){
                 item.textElement.text(item.name + " - " + subtitles[key]);
             }
+        }
+    }
+    Game.prototype.setMessage = function(text){
+        var textElement = this.textElement;
+
+        if(text){
+            textElement.text(text);
+            textElement.show();
+        }else{
+            textElement.hide();
         }
     }
 }

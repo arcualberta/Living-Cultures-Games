@@ -50,6 +50,11 @@
                 user-select: none;
             }
 
+            .info-message {
+                text-align: center;
+                font-size: 2em;
+            }
+
             .card-text{
                 text-align: center;
                 vertical-align: center;
@@ -96,7 +101,7 @@
                 };
 
                 var matchingPairs = {
-                    'Dragon Boat Festival - \n 端午节': ['Rice Dumpling', 'Dragon Boat'],
+                    'Dragon Boat Festival - 端午节': ['Rice Dumpling', 'Dragon Boat'],
                     'Chinese New Year Day - 春节': ['Dumpling', 'Red Banner'],
                     'Lantern Festival - 元宵节': ['Small Dumpling Ball', 'Lantern'],
                     'Mid-Autumn Festival - 中秋节': ['Mooncake', 'Full Moon']
@@ -116,9 +121,17 @@
 
                 game = new Game(allObjects, matchingPairs, 1280, 720, '#gameArea');
                 game.onwin = function () {
+                    game.setMessage(false);
+
                     messagePanel.text("You Win!");
                     messagePanel.show();
                 };
+                game.onfail = function() {
+                    game.setMessage("Something's not right.");
+                };
+                game.onok = function() {
+                    game.setMessage("Good!");
+                }
 
                 game.setSubtitles(subTitles);
             });
